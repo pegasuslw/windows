@@ -1,0 +1,30 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: testAcc - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\liuwei\LOCALS~1\Temp\RSP670.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Debug/testAcc.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"Z:\×ÀÃæ\testAcc\testAccDlg.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\liuwei\LOCALS~1\Temp\RSP670.tmp" 
+Creating command line "link.exe Oleacc.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/testAcc.pdb" /debug /machine:I386 /out:"Debug/testAcc.exe" /pdbtype:sept  ".\Debug\StdAfx.obj" ".\Debug\testAcc.obj" ".\Debug\testAccDlg.obj" ".\Debug\testAcc.res" "
+<h3>Output Window</h3>
+Compiling...
+testAccDlg.cpp
+z:\×ÀÃæ\testacc\testaccdlg.cpp(4) : warning C4652: compiler option 'Generate Browser Info' inconsistent with precompiled header; current command-line option will override that defined in the precompiled header
+Z:\×ÀÃæ\testAcc\testAccDlg.cpp(157) : error C2664: 'MessageBoxA' : cannot convert parameter 2 from 'unsigned short *' to 'const char *'
+        Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+Error executing cl.exe.
+
+
+
+<h3>Results</h3>
+testAcc.exe - 1 error(s), 1 warning(s)
+</pre>
+</body>
+</html>
