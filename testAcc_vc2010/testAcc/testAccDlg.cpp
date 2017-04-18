@@ -3,7 +3,7 @@
 //
 
 #include "stdafx.h"
-#include "vld.h"
+//#include "vld.h"
 #include "testAcc.h"
 #include "testAccDlg.h"
 #include "afxdialogex.h"
@@ -322,10 +322,11 @@ void CtestAccDlg::startConnect(){
 	findAcc(paccMainWindow,ACCEPT_TEXT,m_pFoundAcceptCallback);
 }
 
+#if 0
 int CtestAccDlg::findAcc(IAccessible *pAccParent,CString  text2find, ICallback *pCallback){
 	return 0;
 }
-#if 0
+#else
 int CtestAccDlg::findAcc(IAccessible *pAccParent,CString  text2find, ICallback *pCallback){
 
 	if(NULL == pAccParent){
@@ -333,8 +334,7 @@ int CtestAccDlg::findAcc(IAccessible *pAccParent,CString  text2find, ICallback *
 	}
 
 	HRESULT hr;
-	IAccessible*    paccControl = NULL; //输入框的 IAccessible 接口
-			
+	
 	LONG    childCount = 0;
 	LONG    obtainCount = 0;
 	if (S_OK!=pAccParent->get_accChildCount(&childCount)){
@@ -345,11 +345,7 @@ int CtestAccDlg::findAcc(IAccessible *pAccParent,CString  text2find, ICallback *
 		return -1;
 	}
 	VARIANT* pArray = new VARIANT[childCount];
-	HRESULT result = AccessibleChildren(pAccParent,
-											0,
-											childCount,
-											pArray, 
-											&obtainCount);
+	HRESULT result = AccessibleChildren(pAccParent,	0, childCount,pArray, &obtainCount);
 
 	if(S_OK != result){
 		delete[] pArray;
@@ -372,60 +368,29 @@ int CtestAccDlg::findAcc(IAccessible *pAccParent,CString  text2find, ICallback *
 				VariantInit(&varChild);
 				varChild.vt = VT_I4;
 				varChild.lVal = CHILDID_SELF;
-#if 0
-				
-				if(draw){
-					x1=0;
-					y1=0;
-					width=0;
-					height=0;
-					result = pChild->accLocation(&x1,&y1,&width,&height,varChild);
-					drawRect(x1,y1,x1+width,y1+height);
-				}else{
-					BSTR bstrName;
-					pChild->get_accName(varChild,&bstrName);
-  					if(NULL!=bstrName){
-						CString str1(bstrName);
-						CString str2(ACCEPT_TEXT); 
-						if(str1 == str2){
-							//::MessageBox(NULL,_T("找到了"),_T("111"),MB_OK);      // 找到了
-							return 0;
+				BSTR bstrName = NULL;
+				pChild->get_accName(varChild,&bstrName);
+  				if(NULL!=bstrName){
+					CString str1(bstrName);
+					CString str2(text2find); 
+					if(str1 == str2){
+					//::MessageBox(NULL,_T("找到了"),_T("111"),MB_OK);      // 找到了
+						if(NULL != pCallback){
+							pCallback->doWork(this,pAccParent, varChild);
 						}
+						SysFreeString(bstrName);
+						pChild->Release();
+						pDisp->Release();
+						delete[] pArray;
+						return 0;
 					}
+					SysFreeString(bstrName);
 				}
-				
-#else if
-
-					BSTR bstrName;
-					pChild->get_accName(varChild,&bstrName);
-  					if(NULL!=bstrName){
-						CString str1(bstrName);
-						CString str2(text2find); 
-						if(str1 == str2){
-							//::MessageBox(NULL,_T("找到了"),_T("111"),MB_OK);      // 找到了
-							if(NULL != pCallback){
-								pCallback->doWork(this,pAccParent, varChild);
-							}
-							pChild->Release();
-							pDisp->Release();
-							delete[] pArray;
-							return 0;
-						}
-					}
-#endif
-				
-#if 0
-				if (0 == findAcc(pChild,text2find,pCallback)){
-					pChild->Release();
-					pDisp->Release();
-					delete[] pArray;
-					return 0;
-				}
-#endif 
 				findAcc(pChild,text2find,pCallback);
                 pChild->Release();
             }
-            pDisp->Release();
+			pDisp->Release();
+            
         }
         // Else it's a child element so we have to call accNavigate on the parent,
         //   and we do not recurse because child elements can't have children.
@@ -437,103 +402,37 @@ int CtestAccDlg::findAcc(IAccessible *pAccParent,CString  text2find, ICallback *
 			varChild.vt = VT_I4;
 			varChild.lVal = vtChild.lVal;
 			
-#if 0
-			if(true){
-				x1=0;
-				y1=0;
-				width=0;
-				height=0;
-				result = pAccParent->accLocation(&x1,&y1,&width,&height,varChild);
-				drawRect(x1,y1,x1+width,y1+height);
-			}else{
-				pAccParent->get_accName(varChild,&bstrName);
-				if(NULL!=bstrName ){
-					CString str1(bstrName);
-					CString str2(ACCEPT_TEXT); 
-					if(str1 == str2){                   
-					
-						VARIANT varFocus;
-						HRESULT  result = pAccParent->get_accFocus(&varFocus);
-						if(S_OK == result){
-							pAccParent->get_accName(varChild,&bstrName);
-							if(NULL!=bstrName ){
-								CString str1(bstrName);
-								CString str2(ACCEPT_TEXT);
-								if(str1 == str2){
-									::MessageBox(NULL,_T("找到了"),_T("333"),MB_OK);
-									HWND hChatWnd = ::FindWindow(NULL,_T("王圆圆"));
-									if (!hChatWnd){
-									hChatWnd = ::FindWindow(NULL,_T("刘伟"));
-									}
-
-									if(!hChatWnd){
-										::MessageBox(NULL,_T("没有找到聊天对话框"),_T("Error"),MB_OK);
-										delete[] pArray;
-										return 0;
-									}else{
-										::SendMessage(hChatWnd,WM_KEYUP,VK_RETURN,0xc00f0001);
-										::SendMessage(hChatWnd,WM_KEYDOWN,VK_RETURN,0x000f0001);
-									}
-									
-								}
-								
-							}
-						}
-					}
-				}
-			
+			pAccParent->get_accName(varChild,&bstrName);
+			if(NULL ==bstrName ){
+				continue;
 			}
-#else if
-				pAccParent->get_accName(varChild,&bstrName);
-				if(NULL ==bstrName ){
-					continue;
-				}
 
-				CString str1(bstrName);
-				CString str2(text2find); 
-				if(str1 != str2){                   
-					continue;
-				}
-
-				//pAccParent->get_accState(
-
-				/*
-				VARIANT varFocus;
-				HRESULT  result = pAccParent->get_accFocus(&varFocus);
-				if(S_OK != result){
-						continue;
-				}
-				*/
-
-				//::MessageBox(NULL,_T("找到了"),_T("333"),MB_OK);
-				HWND hChatWnd = ::FindWindow(NULL,_T("王圆圆"));
-				if (!hChatWnd){
-					hChatWnd = ::FindWindow(NULL,_T("刘伟"));
-				}
-
-				if(!hChatWnd){
-						//::MessageBox(NULL,_T("没有找到聊天对话框"),_T("Error"),MB_OK);
-					delete[] pArray;
-					return -1;
-				}else{
-
-					x1=0;
-					y1=0;
-					width=0;
-					height=0;
-					result = pAccParent->accLocation(&x1,&y1,&width,&height,varChild);
-					drawRect(x1,y1,x1+width,y1+height);
-					
-
-#if 1
-					if(NULL != pCallback){
-						pCallback->doWork(this,pAccParent, varChild);
-					}
-#endif
-					//::SendMessage(hChatWnd,WM_KEYUP,VK_RETURN,0xc00f0001);
-					//::SendMessage(hChatWnd,WM_KEYDOWN,VK_RETURN,0x000f0001);
+			CString str1(bstrName);
+			SysFreeString(bstrName);
+			CString str2(text2find); 
+			if(str1 != str2){ 
+				continue;
 			}
-#endif
+			HWND hChatWnd = ::FindWindow(NULL,_T("王圆圆"));
+			if (!hChatWnd){
+				hChatWnd = ::FindWindow(NULL,_T("刘伟"));
+			}
+
+			if(!hChatWnd){
+				//::MessageBox(NULL,_T("没有找到聊天对话框"),_T("Error"),MB_OK);
+				delete[] pArray;
+				return -1;
+			}
+			x1=0;
+			y1=0;
+			width=0;
+			height=0;
+			result = pAccParent->accLocation(&x1,&y1,&width,&height,varChild);
+			drawRect(x1,y1,x1+width,y1+height);
+
+			if(NULL != pCallback){
+				pCallback->doWork(this,pAccParent, varChild);
+			}
               
         }
 
@@ -670,7 +569,7 @@ void CtestAccDlg::OnTimer(UINT_PTR nIDEvent)
 
 	checkState();   // 检查目前状态
 	
-	drawViews();     //  画出矩形 以及状态
+	//drawViews();     //  画出矩形 以及状态
 	 
 #if 0
 	LPTSTR buf= new TCHAR[100];
